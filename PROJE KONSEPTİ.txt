@@ -1,0 +1,7 @@
+Yumruk atýlarak kutuda bulunan oyuncaklarýn daðýlma animasyonunu yapmaya çalýþtým.
+Proje çalýþtýðýnda kutunun içerisinde bulunan oyuncaklar birkaç saniye sonra ekranda
+aþaðýya doðru daðýlmaya baþlýyorlar. Ýstersek  sað yön ok tuþuna basarak hýzlandýrabilir,
+sol yön ok tuþuna  basarak ters yönde ilerletebilir,aþaðý yön ok tuþuna basarak yavaþlatabilir(Slow Motion),
+yukarý yön ok tuþuna basarak 5 saniyelik bir durdurma iþlemi uygulayabiliyoruz.
+Oyuncaklar sanki kutudan yere düþüyor ve yukarýya tekrar çýktýklarý gözükmüyormuþ gibi ayarlamaya çalýþtým.
+

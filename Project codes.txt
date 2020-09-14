@@ -1,0 +1,258 @@
+#include <stdlib.h>
+#include <glut.h>
+#include <math.h>
+#include "yumruk.c"
+#include "top.c"
+#include "dinazor.c"
+#include "balik.c"
+#include "kap.c"
+#include "kap2.c"
+#include "sopa.c"
+#include "sincap.c"
+#include "tavsan.c"
+#include<stdio.h>
+#include<conio.h>
+#include<Windows.h>
+#include "bitmap.c"	
+
+BITMAPINFO *TexInfo, *TexInfo2; 
+GLubyte    *TexBits, *TexBits2; 
+static GLuint texName[2];
+
+
+GLuint	texture[6];		
+GLuint  object = 1;			
+GLfloat angle = 0.0;
+GLfloat density = 0.5; 
+GLfloat fogColor[4] = { 0.5, 0.5, 0.5, 1.0 }; 
+
+
+GLubyte *LoadDIBitmap(const char *filename, BITMAPINFO **info);
+void init(void)
+{
+	glShadeModel(GL_SMOOTH);
+	glClearColor(0.0, 1.0, 1.0, 0.0);
+
+	GLfloat glfLightAmbient[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+	GLfloat glfLightDiffuse[] = { 1.2f, 1.2f, 1.2f, 1.0f };
+	GLfloat glfLightSpecular[] = { 0.9f, 0.9f, 0.9f, 1.0f };
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, glfLightAmbient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, glfLightDiffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, glfLightSpecular);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
+
+	glGenTextures(2, texName);
+	glBindTexture(GL_TEXTURE_2D, texName[0]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, TexInfo->bmiHeader.biWidth,
+		TexInfo->bmiHeader.biHeight, 0, GL_BGR_EXT,
+		GL_UNSIGNED_BYTE, TexBits);
+
+	glBindTexture(GL_TEXTURE_2D, texName[1]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, TexInfo2->bmiHeader.biWidth,
+		TexInfo2->bmiHeader.biHeight, 0, GL_BGR_EXT,
+		GL_UNSIGNED_BYTE, TexBits2);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glEnable(GL_TEXTURE_2D);
+}
+
+GLvoid glDrawCube()
+{
+	glBindTexture(GL_TEXTURE_2D, texName[0]); /* burada küpün resmini deðiþtirdim.Aþaðýda küpü çaðýrarak
+	                                           küpten sonra gelecek olan þekillere de bu resmi kaplattýrdým*/
+	glRotatef(angle, 1.0, 0.0, 0.0);
+	glRotatef(angle, 0.0, 1.0, 0.0);
+	glRotatef(angle, 0.0, 0.0, 1.0);
+	glColor3f(1.0, 0.0, 0.0);
+	glutSolidCube(2);
+	glEnd();
+}
+
+void dönme() {
+	angle = angle + 1.0;
+	glutPostRedisplay();
+
+}
+void tersdönme() {
+	angle = angle + -1.0;
+	glutPostRedisplay();
+
+}
+void yavaþlatma() {
+	angle = angle + -0.2;
+	glutPostRedisplay();
+}
+void durdur() {
+
+	Sleep(5000);
+	glutPostRedisplay();
+
+}
+void display(void)
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+	glEnable(GL_TEXTURE_GEN_S);
+	glEnable(GL_TEXTURE_GEN_T);
+
+	glPushMatrix();
+
+	gluLookAt(5.0, 5.0, 9.0, -3.0, -2.0, 0.0, 0.0, 1.0, 0.0); // modelimizin ekranda nerede duracaðýný ayarladýk
+	yumruk();
+
+	gluLookAt(0.0, 0.0, 6.0, 3.0, 0.0, 5.0, 5.0, 5.0, 5.0);
+	glDrawCube(); /*burada  yukardaki  glDrawcube() fonksiyonunu çaðýrarak küp çizdirdim.Küp ve küpten sonra gelen bütün
+	              þekillerin ayný resimle kaplanmasýný saðladým*/
+	gluLookAt(6.0, 0.0, 3.0, 3.0, 0.0, 5.0, 5.0, 5.0, -10.0);
+	top();
+
+	gluLookAt(0.0, 0.0, 6.0, -9.0, 0.0, 5.0, 5.0, 5.0, 5.0);
+	dinazor();
+
+	gluLookAt(0.0, 0.0, 6.0, -4.0, 0.0, 9.0, 5.0, 5.0, 5.0);
+	balik();
+
+	gluLookAt(0.0, 0.0, 6.0, -3.0, 0.0, 9.0, 5.0, 5.0, 5.0);
+	tavsan();
+
+	gluLookAt(0.0, 0.0, 6.0, -1.0, 0.0, 9.0, 5.0, 5.0, -5.0);
+	sincap();
+
+	gluLookAt(0.0, 0.0, 6.0, -6.0, 0.0, 9.0, 5.0, 5.0, -5.0);
+	kap();
+
+	gluLookAt(0.0, 0.0, 6.0, 0.0, 0.0, 9.0, 5.0, 5.0, 5.0);
+	kap2();
+
+	gluLookAt(0.0, 0.0, 6.0, -6.0, 0.0, 9.0, 5.0, 5.0, 5.0);
+	sopa();
+
+	gluLookAt(0.0, 0.0, 6.0, -9.0, 0.0, 9.0, 5.0, 5.0, 5.0);
+	glDrawCube();
+	glPushMatrix();
+
+	angle = angle + 0.1;   // oyuncaklarýn ekran yüklendiðinde dönmelerini  saðladým
+	glutSwapBuffers();
+	
+	glPopMatrix();
+
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+	glBindTexture(GL_TEXTURE_2D, texName[1]);	// Arka plan resmi 
+	glPushMatrix();
+	glTranslatef(0.0f, 0.0f, 0.0f);
+	glBegin(GL_QUADS);
+	glNormal3f(0.0f, 0.0f, 1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-13.3f, -10.0f, -10.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(13.3f, -10.0f, -10.0f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(13.3f, 10.0f, -10.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-13.3f, 10.0f, -10.0f);
+	glEnd();
+	glPopMatrix();
+
+
+	glFlush();
+
+	
+
+}
+
+void reshape(int w, int h)
+{
+	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(60, (GLfloat)w / (GLfloat)h, 1.0, 100.0);
+	glMatrixMode(GL_MODELVIEW);
+
+}
+
+
+void specialKeys(int key, int x, int y) {
+	switch (key) {
+	case GLUT_KEY_F1:
+		glutPostRedisplay();
+		glutFullScreen();
+		break;
+	case GLUT_KEY_RIGHT:  //saða doðru hýzlandýrma
+		dönme();
+		glutPostRedisplay();
+		display();
+		break;
+
+	case GLUT_KEY_LEFT:  //sola doðru hýzlandýrma
+		tersdönme();
+		glutPostRedisplay();
+		display();
+		break;
+	case GLUT_KEY_DOWN:  //yavaþlatma
+		yavaþlatma();
+		glutPostRedisplay();
+		display();
+		break;
+	case GLUT_KEY_UP:  //Durdurma. 5 saniye bekleterek durduruyoruz eðer tekrar durdurmak isterek bir daha basýyoruz
+
+		durdur();
+		glutPostRedisplay();
+		display();
+		break;
+
+
+
+
+
+		break;
+	}
+}
+
+void processNormalKeys(unsigned char key, int x, int y) {
+	if (key == 27)
+
+		// esc tuþuna basýnca çýkýp yapýyoruz
+		glutPostRedisplay();
+
+	exit(0);
+}
+
+
+int main(int argc, char** argv)
+{
+	TexBits = LoadDIBitmap("punch1.bmp", &TexInfo);
+	TexBits2 = LoadDIBitmap("box2.bmp", &TexInfo2);
+
+
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+	glutInitWindowSize(1920, 1080);
+
+	glutInitWindowPosition(1920, 1080);
+	glutCreateWindow(argv[0]);
+	init();
+	glutDisplayFunc(display);
+	glutIdleFunc(display);
+	glutReshapeFunc(reshape);
+
+
+	glutFullScreen();
+	glutSpecialFunc(specialKeys);
+	glutKeyboardFunc(processNormalKeys);
+
+
+
+	glutMainLoop();
+	return 0;
+}
+
+
+
